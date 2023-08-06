@@ -17,9 +17,64 @@ $datebase = new Database(
 $datebase->connect();
 
 $query = new QueryBuilder();
-$query->select(['title', 'text'])
+
+//query CROSS JOIN =============================
+
+$query->select()
     ->from('news')
-    ->where(['id' => 3, 'title' => 'test']);
+    ->crossJoin('comments');
+
+//query RIGHT JOIN =============================
+
+/*$query->select()
+    ->from('news')
+    ->rightJoin('comments', 'news.id = comments.news_id');*/
+
+//query LEFT JOIN ==============================
+
+/*$query->select()
+    ->from('news')
+    ->leftJoin('comments', 'news.id = comments.news_id');*/
+
+//query INNER JOIN =============================
+
+/*$query->select()
+    ->from('news')
+    ->innerJoin('comments', 'news.id = comments.news_id');*/
+
+//query DELETE =================================
+
+/*$query->delete()
+    ->from('news')
+    ->where(['id' => 31]);*/
+
+//query UPDATE =================================
+
+/*$update_data = [
+    'title' => 'another news',
+    'text' => 'another text',
+    'date' => '2023-08-06 2:00:00',
+];
+$query->update($update_data)
+    ->from('news')
+    ->where(['id' => 30]);*/
+
+//query INSERT =================================
+
+/*$insert_data = [
+    'title' => 'some news',
+    'text' => 'some text',
+    'date' => '2023-08-06 01:30:00'
+];
+$query->insert($insert_data)
+    ->from('news');*/
+
+//query SELECT =================================
+
+/*$query->select(['title', 'text'])
+    ->from('news')
+    ->where(['id' => 3, 'title' => 'test']);*/
+
 $rows = $datebase->execute($query);
 var_dump($rows);
 echo $query->getSql();
