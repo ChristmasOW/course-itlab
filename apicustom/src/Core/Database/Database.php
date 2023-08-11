@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Core\Database;
+
+use Datebase\PDO;
+
 class Database
 {
     protected $host;
@@ -31,7 +35,8 @@ class Database
         return $this->pdo;
     }
 
-    public function execute(QueryBuilder $builder) {
+    public function execute(QueryBuilder $builder)
+    {
         $sth = $this->pdo->prepare($builder->getSql());
         $params = $builder->getParams();
         foreach ($params as $key => $value)

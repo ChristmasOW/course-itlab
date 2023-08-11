@@ -1,28 +1,38 @@
 <?php
 global $CoreParams;
+
+use App\Controllers\FrontController;
+use App\Core\Database\Database;
+
 require_once('../config/config.php');
 spl_autoload_register(function ($className) {
-    $path = "../src/{$className}.php";
+    $newClassName = str_replace('\\', '/', $className);
+    if (stripos($newClassName, 'App/') === 0)
+        $newClassName = substr($newClassName, 4);
+    $path = "../src/{$newClassName}.php";
     if (file_exists($path))
         require_once($path);
 });
 
-$datebase = new Database(
+$front_controller = new FrontController();
+$front_controller->run();
+
+/*$datebase = new Database(
     $CoreParams['Database']['Host'],
     $CoreParams['Database']['UserName'],
     $CoreParams['Database']['Password'],
     $CoreParams['Database']['Database']
 );
 
-$datebase->connect();
+$datebase->connect();*/
 
-$query = new QueryBuilder();
+/*$query = new QueryBuilder();*/
 
 //query CROSS JOIN =============================
 
-$query->select()
+/*$query->select()
     ->from('news')
-    ->crossJoin('comments');
+    ->crossJoin('comments');*/
 
 //query RIGHT JOIN =============================
 
@@ -75,9 +85,9 @@ $query->insert($insert_data)
     ->from('news')
     ->where(['id' => 3, 'title' => 'test']);*/
 
-$rows = $datebase->execute($query);
+/*$rows = $datebase->execute($query);
 var_dump($rows);
-echo $query->getSql();
+echo $query->getSql();*/
 
 $CoreParams ['Database'] = [
     'Host' => '172.22.75.8:3306',
@@ -86,8 +96,7 @@ $CoreParams ['Database'] = [
     'Database' => 'cms'
 ];
 
-/*$front_controller = new FrontController();
-$front_controller->run();*/
+
 
 
 

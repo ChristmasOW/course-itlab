@@ -1,7 +1,11 @@
 <?php
-class Response {
+
+namespace App\Core;
+class Response
+{
     protected $title;
     protected $text;
+
     public function __construct($title, $text)
     {
         $this->title = $title;
@@ -11,14 +15,16 @@ class Response {
     /**
      * @return mixed
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->title;
     }
 
     /**
      * @return mixed
      */
-    public function getText() {
+    public function getText()
+    {
         return $this->text;
     }
 }
