@@ -2,7 +2,7 @@
 
 namespace App\Core\Database;
 
-use Datebase\PDO;
+use PDO;
 
 class Database
 {

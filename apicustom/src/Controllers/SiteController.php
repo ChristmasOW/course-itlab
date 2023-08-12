@@ -2,9 +2,10 @@
 
 namespace App\Controllers;
 
+use App\Core\Controller;
 use App\Core\Response;
 
-class SiteController
+class SiteController extends Controller
 {
     /**
      * @return Response

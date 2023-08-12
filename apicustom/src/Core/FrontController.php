@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Core;
 
 use App\Core\Attributes\Route;
-use App\Core\Response;
-use ReflectionClass;
 
 class FrontController
 {
@@ -25,7 +23,7 @@ class FrontController
 
             $routes = [];
 
-            $reflectionClass = new ReflectionClass($controller_object);
+            $reflectionClass = new \ReflectionClass($controller_object);
             $methods_list = $reflectionClass->getMethods();
             foreach ($methods_list as $reflectionMethod) {
                 $attributes = $reflectionMethod->getAttributes(Route::class);
@@ -48,6 +46,10 @@ class FrontController
                 $response = $controller_object->$method();
                 if ($response instanceof Response) {
                     echo $response->getText();
+                }
+                /** @var $response string */
+                if (gettype($response) === 'string') {
+                    echo $response;
                 }
             } else {
                 echo 'Error: 404';

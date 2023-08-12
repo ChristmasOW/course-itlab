@@ -1,8 +1,10 @@
 <?php
 global $CoreParams;
 
-use App\Controllers\FrontController;
 use App\Core\Database\Database;
+use App\Core\FrontController;
+use App\Core\StaticCore;
+use App\Models\News;
 
 require_once('../config/config.php');
 spl_autoload_register(function ($className) {
@@ -14,87 +16,23 @@ spl_autoload_register(function ($className) {
         require_once($path);
 });
 
-$front_controller = new FrontController();
-$front_controller->run();
+StaticCore::Init();
+StaticCore::Run();
+StaticCore::Done();
 
-/*$datebase = new Database(
+$database = new Database(
     $CoreParams['Database']['Host'],
     $CoreParams['Database']['UserName'],
     $CoreParams['Database']['Password'],
     $CoreParams['Database']['Database']
 );
+$database->connect();
 
-$datebase->connect();*/
-
-/*$query = new QueryBuilder();*/
-
-//query CROSS JOIN =============================
-
-/*$query->select()
-    ->from('news')
-    ->crossJoin('comments');*/
-
-//query RIGHT JOIN =============================
-
-/*$query->select()
-    ->from('news')
-    ->rightJoin('comments', 'news.id = comments.news_id');*/
-
-//query LEFT JOIN ==============================
-
-/*$query->select()
-    ->from('news')
-    ->leftJoin('comments', 'news.id = comments.news_id');*/
-
-//query INNER JOIN =============================
-
-/*$query->select()
-    ->from('news')
-    ->innerJoin('comments', 'news.id = comments.news_id');*/
-
-//query DELETE =================================
-
-/*$query->delete()
-    ->from('news')
-    ->where(['id' => 31]);*/
-
-//query UPDATE =================================
-
-/*$update_data = [
-    'title' => 'another news',
-    'text' => 'another text',
-    'date' => '2023-08-06 2:00:00',
-];
-$query->update($update_data)
-    ->from('news')
-    ->where(['id' => 30]);*/
-
-//query INSERT =================================
-
-/*$insert_data = [
-    'title' => 'some news',
-    'text' => 'some text',
-    'date' => '2023-08-06 01:30:00'
-];
-$query->insert($insert_data)
-    ->from('news');*/
-
-//query SELECT =================================
-
-/*$query->select(['title', 'text'])
-    ->from('news')
-    ->where(['id' => 3, 'title' => 'test']);*/
-
-/*$rows = $datebase->execute($query);
-var_dump($rows);
-echo $query->getSql();*/
-
-$CoreParams ['Database'] = [
-    'Host' => '172.22.75.8:3306',
-    'UserName' => 'cms-user',
-    'Password' => '0314',
-    'Database' => 'cms'
-];
+$record = new News();
+$record->title = 'title';
+$record->text = 'some text';
+$record->date = '2023-08-11 19:40:00';
+$record->save();
 
 
 

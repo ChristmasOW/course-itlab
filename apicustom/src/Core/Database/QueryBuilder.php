@@ -15,7 +15,7 @@ class QueryBuilder
         $this->params = [];
     }
 
-    public function select($fields = "*")
+    public function select(mixed $fields = "*"): self
     {
         $this->type = "select";
         $fields_string = $fields;
@@ -25,7 +25,7 @@ class QueryBuilder
         return $this;
     }
 
-    public function from($table)
+    public function from($table): self
     {
         $this->table = $table;
         return $this;
@@ -55,7 +55,7 @@ class QueryBuilder
         return $this;
     }
 
-    public function insert($insert_data)
+    public function insert($insert_data) : self
     {
         $this->type = "insert";
         if (is_array($insert_data)) {
@@ -117,7 +117,7 @@ class QueryBuilder
         }
     }
 
-    public function where($where)
+    public function where($where): self
     {
         /*if (is_a($where)) {
 
