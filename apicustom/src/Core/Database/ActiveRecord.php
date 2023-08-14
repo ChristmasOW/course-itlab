@@ -2,16 +2,19 @@
 
 namespace App\Core\Database;
 
+use App\Core\Core;
 use App\Core\StaticCore;
 
 class ActiveRecord
 {
     protected array $fields = [];
     protected string $table;
+
     public function __construct()
     {
 
     }
+
     public function __set(string $name, $value): void
     {
         $this->fields[$name] = $value;
@@ -21,6 +24,7 @@ class ActiveRecord
     {
         return $this->fields[$name];
     }
+
     public function __call(string $name, array $arguments)
     {
         switch ($name) {
@@ -31,7 +35,7 @@ class ActiveRecord
                 if (!empty($this->table)) {
                     $builder->insert($this->fields);
                     $builder->from($this->table);
-                    StaticCore::GetDatabase()->execute($builder);
+                    Core::GetInstance()->GetDatabase()->execute($builder);
                 } else {
                     // Error
                 }

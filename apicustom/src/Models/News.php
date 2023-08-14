@@ -10,7 +10,6 @@ use App\Core\Database\ActiveRecord;
  * @property string $text Text of news
  * @property string $date Date of news
  */
-
 class News extends ActiveRecord
 {
     public function __construct()

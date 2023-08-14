@@ -55,7 +55,7 @@ class QueryBuilder
         return $this;
     }
 
-    public function insert($insert_data) : self
+    public function insert($insert_data): self
     {
         $this->type = "insert";
         if (is_array($insert_data)) {
@@ -102,6 +102,15 @@ class QueryBuilder
                 $sql = "INSERT INTO {$this->table} {$this->fields} VALUES {$this->values}";
                 return $sql;
                 break;
+            /*case 'insert':
+                $field_list = array_keys($this->params);
+                $field_string = implode(', ', $field_list);
+                $value_list = array_values($this->params);
+                $value_string = implode('\', \'', $value_list);
+                $sql = "INSERT INTO {$this->table} ({$field_string}) VALUES ({$value_string})";
+                $this->params = [];
+                return $sql;
+                break;*/
             case 'update':
                 $sql = "UPDATE {$this->table} SET {$this->fields}";
                 if (!empty($this->where))

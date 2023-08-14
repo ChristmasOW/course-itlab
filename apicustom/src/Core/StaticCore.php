@@ -8,7 +8,14 @@ class StaticCore
 {
     private static Database $database;
     private static FrontController $frontController;
-    public static function GetDatabase(): Database {
+
+    private function __construct()
+    {
+
+    }
+
+    public static function GetDatabase(): Database
+    {
         return self::$database;
     }
 
