@@ -20,9 +20,7 @@ class FrontController
         }
         if (class_exists($controller)) {
             $controller_object = new $controller();
-
             $routes = [];
-
             $reflectionClass = new \ReflectionClass($controller_object);
             $methods_list = $reflectionClass->getMethods();
             foreach ($methods_list as $reflectionMethod) {
@@ -36,11 +34,10 @@ class FrontController
                             'method' => $route->getMethod()
                         ];
                     }
+                    if (!empty($routes[$method]))
+                        $method = $routes[$method]['action'];
                 }
             }
-            if (!empty($routes[$method]))
-                $method = $routes[$method]['action'];
-
             if (method_exists($controller, $method)) {
                 /** @var  $response Response */
                 $response = $controller_object->$method();

@@ -16,22 +16,15 @@ spl_autoload_register(function ($className) {
         require_once($path);
 });
 
-StaticCore::Init();
-StaticCore::Run();
-StaticCore::Done();
+$core = \App\Core\Core::GetInstance();
+$core->init();
+$core->run();
+$core->done();
 
-$database = new Database(
-    $CoreParams['Database']['Host'],
-    $CoreParams['Database']['UserName'],
-    $CoreParams['Database']['Password'],
-    $CoreParams['Database']['Database']
-);
-$database->connect();
-
-$record = new News();
+$record = new \App\Models\News();
 $record->title = 'title';
 $record->text = 'some text';
-$record->date = '2023-08-11 19:40:00';
+$record->date = '2023-08-14 23:00:00';
 $record->save();
 
 

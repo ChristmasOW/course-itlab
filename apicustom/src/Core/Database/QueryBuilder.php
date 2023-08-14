@@ -7,6 +7,7 @@ class QueryBuilder
     protected $table;
     protected $type;
     protected $params;
+    protected $values;
     protected $where;
     protected $joins = [];
 
@@ -55,20 +56,21 @@ class QueryBuilder
         return $this;
     }
 
-    public function insert($insert_data) : self
+    public function insert($data, $table): self
     {
         $this->type = "insert";
-        if (is_array($insert_data)) {
-            $insert_string = implode(", ", array_keys($insert_data));
-            $values = ":" . implode(", :", array_keys($insert_data));
-        }
-        $this->fields = "($insert_string)";
-        $this->params = $insert_data;
+        $this->table = $table;
+        $columns = implode(', ', array_keys($data));
+        $values = implode(', ', array_map(function ($value) {
+            return ':' . $value;
+        }, array_keys($data)));
+        $this->fields = "($columns)";
         $this->values = "($values)";
+        $this->params = $data;
         return $this;
     }
 
-    public function update($update_data)
+    public function update($update_data): self
     {
         $this->type = "update";
         $update_parts = [];
@@ -80,7 +82,7 @@ class QueryBuilder
         return $this;
     }
 
-    public function delete()
+    public function delete(): self
     {
         $this->type = "delete";
         return $this;
@@ -98,7 +100,7 @@ class QueryBuilder
                     $sql .= " WHERE {$this->where}";
                 return $sql;
                 break;
-            case 'insert':
+            case "insert":
                 $sql = "INSERT INTO {$this->table} {$this->fields} VALUES {$this->values}";
                 return $sql;
                 break;
