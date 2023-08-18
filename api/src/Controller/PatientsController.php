@@ -32,6 +32,7 @@ class PatientsController extends AbstractController
     public function create(Request $request): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
+
         if (!isset(
             $requestData['name'],
             $requestData['gender'],
@@ -44,6 +45,7 @@ class PatientsController extends AbstractController
         }
 
         $medications = $this->entityManager->getRepository(Medications::class)->find($requestData["medications"]);
+
         if (!$medications) {
             throw new Exception("Medications with id " . $requestData['medications'] . " not found");
         }
@@ -55,6 +57,7 @@ class PatientsController extends AbstractController
         if (!$record) {
             throw new Exception("Record with id " . $requestData['record'] . " not found");
         }
+
         $patient = new Patients();
 
         $patient

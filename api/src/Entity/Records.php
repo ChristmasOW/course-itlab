@@ -54,6 +54,7 @@ class Records implements \JsonSerializable
     public function setDiagnosis(?string $diagnosis): self
     {
         $this->diagnosis = $diagnosis;
+
         return $this;
     }
 
@@ -71,6 +72,7 @@ class Records implements \JsonSerializable
     public function setDate(?\DateTimeInterface $date): self
     {
         $this->date = $date;
+
         return $this;
     }
 
@@ -88,6 +90,7 @@ class Records implements \JsonSerializable
     public function setNotes(?string $notes): self
     {
         $this->notes = $notes;
+
         return $this;
     }
 
@@ -105,6 +108,7 @@ class Records implements \JsonSerializable
     public function setPatients(Patients $patients): self
     {
         $this->patients = $patients;
+
         return $this;
     }
 
@@ -122,6 +126,7 @@ class Records implements \JsonSerializable
     public function setDoctors(Doctors $doctors): self
     {
         $this->doctors = $doctors;
+
         return $this;
     }
 
@@ -139,6 +144,7 @@ class Records implements \JsonSerializable
     public function setDepartments(Departments $departments): self
     {
         $this->departments = $departments;
+
         return $this;
     }
 
@@ -156,6 +162,7 @@ class Records implements \JsonSerializable
     public function setMedications(Medications $medications): self
     {
         $this->medications = $medications;
+
         return $this;
     }
 

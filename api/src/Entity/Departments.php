@@ -44,6 +44,7 @@ class Departments implements \JsonSerializable
     public function setName(?string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -61,6 +62,7 @@ class Departments implements \JsonSerializable
     public function setLocation(?string $location): self
     {
         $this->location = $location;
+
         return $this;
     }
 
@@ -78,6 +80,7 @@ class Departments implements \JsonSerializable
     public function setDoctors(Doctors $doctors): self
     {
         $this->doctors = $doctors;
+
         return $this;
     }
 

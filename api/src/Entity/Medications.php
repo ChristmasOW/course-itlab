@@ -49,6 +49,7 @@ class Medications implements \JsonSerializable
     public function setName(?string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -66,6 +67,7 @@ class Medications implements \JsonSerializable
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -83,6 +85,7 @@ class Medications implements \JsonSerializable
     public function setManufacturer(?string $manufacturer): self
     {
         $this->manufacturer = $manufacturer;
+
         return $this;
     }
 

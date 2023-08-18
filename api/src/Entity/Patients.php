@@ -53,6 +53,7 @@ class Patients implements JsonSerializable
     public function setName(?string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -70,6 +71,7 @@ class Patients implements JsonSerializable
     public function setGender(?string $gender): self
     {
         $this->gender = $gender;
+
         return $this;
     }
 
@@ -87,6 +89,7 @@ class Patients implements JsonSerializable
     public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
+
         return $this;
     }
 
@@ -104,6 +107,7 @@ class Patients implements JsonSerializable
     public function setDoctors(?Doctors $doctors): self
     {
         $this->doctors = $doctors;
+
         return $this;
     }
 
@@ -121,6 +125,7 @@ class Patients implements JsonSerializable
     public function setMedications(Medications $medications): self
     {
         $this->medications = $medications;
+
         return $this;
     }
 
@@ -138,6 +143,7 @@ class Patients implements JsonSerializable
     public function setRecords(?Records $records): self
     {
         $this->records = $records;
+
         return $this;
     }
 

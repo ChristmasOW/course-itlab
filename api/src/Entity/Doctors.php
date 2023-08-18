@@ -52,6 +52,7 @@ class Doctors implements \JsonSerializable
     public function setName(?string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -69,6 +70,7 @@ class Doctors implements \JsonSerializable
     public function setSpecialization(?string $specialization): self
     {
         $this->specialization = $specialization;
+
         return $this;
     }
 
@@ -86,6 +88,7 @@ class Doctors implements \JsonSerializable
     public function setSalary(?string $salary): self
     {
         $this->salary = $salary;
+
         return $this;
     }
 
@@ -103,6 +106,7 @@ class Doctors implements \JsonSerializable
     public function setPatients(Collection $patients): self
     {
         $this->patients = $patients;
+
         return $this;
     }
 
@@ -120,6 +124,7 @@ class Doctors implements \JsonSerializable
     public function setDepartments(?Departments $departments): self
     {
         $this->departments = $departments;
+
         return $this;
     }
 
