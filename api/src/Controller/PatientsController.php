@@ -2,10 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Doctors;
-use App\Entity\Medications;
+
 use App\Entity\Patients;
-use App\Entity\Records;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -16,7 +14,6 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PatientsController extends AbstractController
 {
-
     /** @var EntityManagerInterface */
     private EntityManagerInterface $entityManager;
 
@@ -28,45 +25,35 @@ class PatientsController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     #[Route('/patient-create', name: 'patient_create')]
-    public function create(Request $request): JsonResponse
+    public function createPatient(Request $request): JsonResponse
     {
+        /** @var $requestData */
         $requestData = json_decode($request->getContent(), true);
 
         if (!isset(
             $requestData['name'],
+            $requestData['age'],
             $requestData['gender'],
             $requestData['phone'],
-            $requestData['medications'],
-            $requestData['doctors'],
-            $requestData['record']
+            $requestData['address']
         )) {
             throw new Exception('Invalid request data');
         }
 
-        $medications = $this->entityManager->getRepository(Medications::class)->find($requestData["medications"]);
-
-        if (!$medications) {
-            throw new Exception("Medications with id " . $requestData['medications'] . " not found");
-        }
-        $doctors = $this->entityManager->getRepository(Doctors::class)->find($requestData["doctors"]);
-        if (!$doctors) {
-            throw new Exception("Doctor with id " . $requestData['doctors'] . " not found");
-        }
-        $record = $this->entityManager->getRepository(Records::class)->find($requestData["record"]);
-        if (!$record) {
-            throw new Exception("Record with id " . $requestData['record'] . " not found");
-        }
-
+        /** @var $patient */
         $patient = new Patients();
 
         $patient
             ->setName($requestData['name'])
+            ->setAge($requestData['age'])
             ->setGender($requestData['gender'])
             ->setPhone($requestData['phone'])
-            ->setMedications($medications)
-            ->setDoctors($doctors)
-            ->setRecords($record);
+            ->setAddress($requestData['address']);
 
         $this->entityManager->persist($patient);
         $this->entityManager->flush();
@@ -75,75 +62,107 @@ class PatientsController extends AbstractController
     }
 
     /**
-     * @param Request $request
      * @return JsonResponse
      */
-    #[Route(path: "patients-test", name: "app_test")]
-    public function test(Request $request): JsonResponse
+    #[Route('/patients', name: 'patients_get_all')]
+    public function getAllPatients(): JsonResponse
     {
-        $patient = $this->entityManager->getRepository(Patients::class)->getAllPatients('AAA');
+        /** @var Patients $patients */
+        $patients = $this->entityManager->getRepository(Patients::class)->findAll();
 
-        return new JsonResponse($patient);
-    }
-
-    #[Route('/products', name: 'product_get_all')]
-    public function getAll(): JsonResponse
-    {
-        /** @var Product $product */
-        $products = $this->entityManager->getRepository(Product::class)->findAll();
-
-        return new JsonResponse($products);
+        return new JsonResponse($patients, Response::HTTP_OK);
     }
 
     /**
      * @param string $id
      * @return JsonResponse
      */
-    #[Route('product/{id}', name: 'product_get_item')]
-    public function getItem(string $id): JsonResponse
+    #[Route('patient/{id}', name: 'patient_get_one')]
+    public function getPatient(string $id): JsonResponse
     {
-        /** @var Product $product */
-        $product = $this->entityManager->getRepository(Product::class)->find($id);
+        /** @var Patients $patient */
+        $patient = $this->entityManager->getRepository(Patients::class)->find($id);
 
-        if (!$product) {
-            throw new Exception("Product with id: " . $id . " not found");
+        if (!$patient) {
+            throw new Exception("Patient with id: " . $id . " not found");
         }
 
-        return new JsonResponse($product);
+        return new JsonResponse($patient, Response::HTTP_OK);
     }
 
-    #[Route('product-update/{id}', name: 'product_update_item')]
-    public function updateProduct(string $id): JsonResponse
+    /**
+     * @param Request $request
+     * @param string $id
+     * @return JsonResponse
+     */
+    #[Route('patient-update/{id}', name: 'patient_update_item')]
+    public function updatePatient(Request $request, string $id): JsonResponse
     {
-        /** @var Product $product */
-        $product = $this->entityManager->getRepository(Product::class)->find($id);
+        /** @var Patients $patient */
+        $patient = $this->entityManager->getRepository(Patients::class)->find($id);
 
-        if (!$product) {
-            throw new Exception("Product with id: " . $id . " not found");
+        if (!$patient) {
+            throw new Exception("Patient with id: " . $id . " not found");
         }
 
-        $product->setName("new name");
+        /** @var $requestData */
+        $requestData = json_decode($request->getContent(), true);
+
+        /** @var $fieldsToUpdate */
+        $fieldsToUpdate = ['name', 'age', 'gender', 'phone', 'address'];
+
+        foreach ($fieldsToUpdate as $field) {
+            if (isset($requestData[$field])) {
+                $setterMethod = 'set' . ucfirst($field);
+                $patient->$setterMethod($requestData[$field]);
+            }
+        }
 
         $this->entityManager->flush();
 
-        return new JsonResponse($product);
+        return new JsonResponse($patient, Response::HTTP_OK);
     }
 
-    #[Route('product-delete/{id}', name: 'product_delete_item')]
-    public function deleteProduct(string $id): JsonResponse
+    /**
+     * @param string $id
+     * @return JsonResponse
+     */
+    #[Route('patient-delete/{id}', name: 'patient_delete_item')]
+    public function deletePatient(string $id): JsonResponse
     {
-        /** @var Product $product */
-        $product = $this->entityManager->getRepository(Product::class)->find($id);
+        /** @var Patients $patient */
+        $patient = $this->entityManager->getRepository(Patients::class)->find($id);
 
-        if (!$product) {
-            throw new Exception("Product with id: " . $id . " not found");
+        if (!$patient) {
+            throw new Exception("Patients with id: " . $id . " not found");
         }
 
-        $product->setName("new name");
-
-        $this->entityManager->remove($product);
+        $this->entityManager->remove($patient);
         $this->entityManager->flush();
 
-        return new JsonResponse();
+        return new JsonResponse('', Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    #[Route(path: "patients-find", name: "app_find")]
+    public function findPatient(Request $request): JsonResponse
+    {
+        $requestData = $request->query->all();
+
+        /** @var Patients $patient */
+        $patient = $this->entityManager->getRepository(Patients::class)->getAllPatients(
+            $requestData['itemsPerPage'] ?? 10,
+            $requestData['page'] ?? 1,
+            $requestData['name'] ?? null,
+            $requestData['age'] ?? null,
+            $requestData['gender'] ?? null,
+            $requestData['phone'] ?? null,
+            $requestData['address'] ?? null
+        );
+
+        return new JsonResponse($patient);
     }
 }

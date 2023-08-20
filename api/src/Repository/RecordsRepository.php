@@ -21,28 +21,25 @@ class RecordsRepository extends ServiceEntityRepository
         parent::__construct($registry, Records::class);
     }
 
-//    /**
-//     * @return Records[] Returns an array of Records objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('r.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Records
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function getAllRecords(int     $itemsPerPage, int $page, ?string $patient = null, ?string $date = null,
+                                   ?string $doctor = null, ?string $diagnosis = null, ?string $notes = null): array
+    {
+        return $this->createQueryBuilder('records')
+            ->join('records.patients_id', 'patient')
+            ->andWhere("records.patient LIKE :patient")
+            ->andWhere("records.date LIKE :date")
+            ->andWhere("records.doctor LIKE :doctor")
+            ->andWhere("records.diagnosis LIKE :diagnosis")
+            ->andWhere("records.notes LIKE :notes")
+            ->setParameter("patient", "%" . $patient . "%")
+            ->setParameter("date", "%" . $date . "%")
+            ->setParameter("doctor", "%" . $doctor . "%")
+            ->setParameter("diagnosis", "%" . $diagnosis . "%")
+            ->setParameter("notes", "%" . $notes . "%")
+            ->setFirstResult($itemsPerPage * ($page - 1))
+            ->setMaxResults($itemsPerPage)
+            ->orderBy('records.date', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

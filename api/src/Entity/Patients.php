@@ -3,37 +3,55 @@
 namespace App\Entity;
 
 use App\Repository\PatientsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
 
 #[ORM\Entity(repositoryClass: PatientsRepository::class)]
-
 class Patients implements JsonSerializable
 {
+    /** @var int|null */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    /** @var string|null */
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    /** @var int|null */
+    #[ORM\Column(nullable: true)]
+    private ?int $age = null;
+
+    /** @var string|null */
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $gender = null;
 
-    #[ORM\Column(length: 255)]
+    /** @var string|null */
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $phone = null;
 
-    #[ORM\ManyToOne(targetEntity: Doctors::class, inversedBy: "patients")]
-    private ?Doctors $doctors = null;
+    /** @var string|null */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $address = null;
 
-    #[ORM\ManyToOne(targetEntity: Medications::class, inversedBy: "patients")]
-    private Medications $medications;
+    /** @var Collection */
+    #[ORM\OneToMany(mappedBy: "patients", targetEntity: Records::class)]
+    private Collection $records;
 
-    #[ORM\OneToOne(mappedBy: "patients",targetEntity: Records::class)]
-    private ?Records $records = null;
+    /**
+     * Records constructor
+     */
+    public function __construct()
+    {
+        $this->records = new ArrayCollection();
+    }
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
@@ -49,10 +67,30 @@ class Patients implements JsonSerializable
 
     /**
      * @param string|null $name
+     * @return $this
      */
     public function setName(?string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getAge(): ?int
+    {
+        return $this->age;
+    }
+
+    /**
+     * @param int|null $age
+     * @return $this
+     */
+    public function setAge(?int $age): self
+    {
+        $this->age = $age;
 
         return $this;
     }
@@ -67,6 +105,7 @@ class Patients implements JsonSerializable
 
     /**
      * @param string|null $gender
+     * @return $this
      */
     public function setGender(?string $gender): self
     {
@@ -85,6 +124,7 @@ class Patients implements JsonSerializable
 
     /**
      * @param string|null $phone
+     * @return $this
      */
     public function setPhone(?string $phone): self
     {
@@ -94,69 +134,55 @@ class Patients implements JsonSerializable
     }
 
     /**
-     * @return Doctors|null
+     * @return string|null
      */
-    public function getDoctors(): ?Doctors
+    public function getAddress(): ?string
     {
-        return $this->doctors;
+        return $this->address;
     }
 
     /**
-     * @param Doctors|null $doctors
+     * @param string|null $address
+     * @return $this
      */
-    public function setDoctors(?Doctors $doctors): self
+    public function setAddress(?string $address): self
     {
-        $this->doctors = $doctors;
+        $this->address = $address;
 
         return $this;
     }
 
     /**
-     * @return Medications
+     * @return Collection
      */
-    public function getMedications(): Medications
-    {
-        return $this->medications;
-    }
-
-    /**
-     * @param Medications $medications
-     */
-    public function setMedications(Medications $medications): self
-    {
-        $this->medications = $medications;
-
-        return $this;
-    }
-
-    /**
-     * @return Records|null
-     */
-    public function getRecords(): ?Records
+    public function getRecords(): Collection
     {
         return $this->records;
     }
 
     /**
-     * @param Records|null $records
+     * @param Collection $records
+     * @return $this
      */
-    public function setRecords(?Records $records): self
+    public function setRecords(Collection $records): self
     {
         $this->records = $records;
 
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function jsonSerialize(): array
     {
         return [
-            "id" => $this->getId(),
+            "id"   => $this->getId(),
             "name" => $this->getName(),
+            "age" => $this->getAge(),
             "gender" => $this->getGender(),
             "phone" => $this->getPhone(),
-            "medications" => $this->getMedications(),
-            "doctors" => $this->getDoctors(),
-            "record" => $this->getRecords()
+            "address" => $this->getAddress()
         ];
     }
 }
