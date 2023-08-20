@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Records;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,16 +22,29 @@ class RecordsRepository extends ServiceEntityRepository
         parent::__construct($registry, Records::class);
     }
 
-    public function getAllRecords(int     $itemsPerPage, int $page, ?string $patient = null, ?string $date = null,
-                                   ?string $doctor = null, ?string $diagnosis = null, ?string $notes = null): array
+    /**
+     * @param int $itemsPerPage
+     * @param int $page
+     * @param int|null $id
+     * @param string|null $patient
+     * @param DateTimeInterface|null $date
+     * @param string|null $doctor
+     * @param string|null $diagnosis
+     * @param string|null $notes
+     * @return array
+     */
+    public function getAllRecords(int     $itemsPerPage, int $page, ?int $id = null, ?string $patient = null, ?DateTimeInterface $date = null,
+                                  ?string $doctor = null, ?string $diagnosis = null, ?string $notes = null): array
     {
         return $this->createQueryBuilder('records')
-            ->join('records.patients_id', 'patient')
-            ->andWhere("records.patient LIKE :patient")
+            ->join('records.patients', 'patients')
+            ->andWhere("records.id LIKE :id")
+            ->andWhere("patients.name LIKE :patient")
             ->andWhere("records.date LIKE :date")
             ->andWhere("records.doctor LIKE :doctor")
             ->andWhere("records.diagnosis LIKE :diagnosis")
             ->andWhere("records.notes LIKE :notes")
+            ->setParameter("id", "%" . $id . "%")
             ->setParameter("patient", "%" . $patient . "%")
             ->setParameter("date", "%" . $date . "%")
             ->setParameter("doctor", "%" . $doctor . "%")

@@ -2,12 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Doctors;
-use App\Entity\Medications;
 use App\Entity\Patients;
-use App\Entity\PatientsOld;
 use App\Entity\Records;
-use App\Entity\RecordsOld;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -33,7 +30,7 @@ class RecordsController extends AbstractController
     /**
      * @param Request $request
      * @return JsonResponse
-     * @throws Exception
+     * @throws \Exception
      */
     #[Route('/record-create', name: 'record_create')]
     public function createRecord(Request $request): JsonResponse
@@ -57,12 +54,14 @@ class RecordsController extends AbstractController
             throw new Exception("Patient with id " . $requestData['patient'] . " not found");
         }
 
+        $date = new DateTime($requestData['date']);
+
         /** @var $record */
         $record = new Records();
 
         $record
             ->setPatients($patient)
-            ->setDate($requestData['date'])
+            ->setDate($date)
             ->setDoctor($requestData['doctor'])
             ->setDiagnosis($requestData['diagnosis'])
             ->setNotes($requestData['notes']);
@@ -159,15 +158,16 @@ class RecordsController extends AbstractController
      * @param Request $request
      * @return JsonResponse
      */
-    #[Route(path: "records-find", name: "app_find")]
+    #[Route(path: "records-find", name: "app_find_records")]
     public function findRecord(Request $request): JsonResponse
     {
         $requestData = $request->query->all();
 
-        /** @var Patients $patient */
-        $record = $this->entityManager->getRepository(Patients::class)->getAllRecords(
+        /** @var Records $record */
+        $record = $this->entityManager->getRepository(Records::class)->getAllRecords(
             $requestData['itemsPerPage'] ?? 10,
             $requestData['page'] ?? 1,
+            $requestData['id'] ?? null,
             $requestData['patient'] ?? null,
             $requestData['date'] ?? null,
             $requestData['doctor'] ?? null,

@@ -24,6 +24,7 @@ class PatientsRepository extends ServiceEntityRepository
     /**
      * @param int $itemsPerPage
      * @param int $page
+     * @param int|null $id
      * @param string|null $name
      * @param string|null $age
      * @param string|null $gender
@@ -31,15 +32,17 @@ class PatientsRepository extends ServiceEntityRepository
      * @param string|null $address
      * @return array
      */
-    public function getAllPatients(int     $itemsPerPage, int $page, ?string $name = null, ?string $age = null,
+    public function getAllPatients(int     $itemsPerPage, int $page, ?int $id = null, ?string $name = null, ?string $age = null,
                                    ?string $gender = null, ?string $phone = null, ?string $address = null): array
     {
         return $this->createQueryBuilder('patients')
+            ->andWhere("patients.id LIKE :id")
             ->andWhere("patients.name LIKE :name")
             ->andWhere("patients.age LIKE :age")
             ->andWhere("patients.gender LIKE :gender")
             ->andWhere("patients.phone LIKE :phone")
             ->andWhere("patients.address LIKE :address")
+            ->setParameter("id", "%" . $id . "%")
             ->setParameter("name", "%" . $name . "%")
             ->setParameter("age", "%" . $age . "%")
             ->setParameter("gender", "%" . $gender . "%")

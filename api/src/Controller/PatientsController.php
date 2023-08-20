@@ -156,6 +156,7 @@ class PatientsController extends AbstractController
         $patient = $this->entityManager->getRepository(Patients::class)->getAllPatients(
             $requestData['itemsPerPage'] ?? 10,
             $requestData['page'] ?? 1,
+            $requestData['id'] ?? null,
             $requestData['name'] ?? null,
             $requestData['age'] ?? null,
             $requestData['gender'] ?? null,

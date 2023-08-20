@@ -177,7 +177,7 @@ class Patients implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            "id"   => $this->getId(),
+            "id" => $this->getId(),
             "name" => $this->getName(),
             "age" => $this->getAge(),
             "gender" => $this->getGender(),
