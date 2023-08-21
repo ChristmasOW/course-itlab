@@ -164,6 +164,6 @@ class PatientsController extends AbstractController
             $requestData['address'] ?? null
         );
 
-        return new JsonResponse($patient);
+        return new JsonResponse($patient, Response::HTTP_OK);
     }
 }
