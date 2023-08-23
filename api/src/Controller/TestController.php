@@ -2,58 +2,63 @@
 
 namespace App\Controller;
 
-use App\Entity\Category;
 use App\Entity\Product;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class TestController extends AbstractController
 {
-    /**
-     * @var UserPasswordHasherInterface
-     */
-    private UserPasswordHasherInterface $passwordHasher;
 
-    /** @var EntityManagerInterface */
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
 
     /**
-     * @param UserPasswordHasherInterface $passwordHasher
      * @param EntityManagerInterface $entityManager
      */
-    public function __construct(EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->passwordHasher = $passwordHasher;
         $this->entityManager = $entityManager;
     }
 
     /**
-     * @param Request $request
      * @return JsonResponse
-     * @throws Exception
      */
     #[Route(path: "test", name: "app_test")]
-    public function test(Request $request): JsonResponse
+    public function test(): JsonResponse
     {
-        $pass = "test123";
-        $user = new User();
-        $user->setEmail("test@gmail.com");
+        $user = $this->getUser();
 
-        $hashedPassword = $this->passwordHasher->hashPassword(
-            $user,
-            $pass
-        );
-        $user->setPassword($hashedPassword);
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        $products = $this->entityManager->getRepository(Product::class)->findAll();
 
-        return new JsonResponse();
+        if (in_array(User::ROLE_ADMIN, $user->getRoles())) {
+            return new JsonResponse($products);
+        }
+
+        return new JsonResponse($this->fetchProductsForUser($products));
     }
+
+    /**
+     * @param array $products
+     * @return array
+     */
+    public function fetchProductsForUser(array $products): array
+    {
+        $fetchedProductsForUser = null;
+
+        /** @var Product $product */
+        foreach ($products as $product) {
+            $tmpProductData = $product->jsonSerialize();
+
+            unset($tmpProductData['description']);
+            $fetchedProductsForUser[] = $tmpProductData;
+        }
+
+        return $fetchedProductsForUser;
+    }
+
 }
