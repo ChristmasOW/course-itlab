@@ -44,17 +44,9 @@ class ProductController extends AbstractController
         if (!isset(
             $requestData['price'],
             $requestData['name'],
-            $requestData['description'],
-            $requestData['category']
+            $requestData['description']
         )) {
             throw new Exception('Invalid request data');
-        }
-
-        /** @var $category */
-        $category = $this->entityManager->getRepository(Category::class)->find($requestData["category"]);
-
-        if (!$category) {
-            throw new Exception("Category with id " . $requestData['category'] . " not found");
         }
 
         /** @var $product */
@@ -63,8 +55,7 @@ class ProductController extends AbstractController
         $product
             ->setPrice($requestData['price'])
             ->setName($requestData['name'])
-            ->setDescription($requestData['description'])
-            ->setCategory($category);
+            ->setDescription($requestData['description']);
 
         if (in_array(User::ROLE_ADMIN, $user->getRoles())) {
             $this->entityManager->persist($product);
@@ -137,11 +128,6 @@ class ProductController extends AbstractController
             }
         }
 
-        $category = $this->entityManager->getRepository(Category::class)->find($requestData["category"]);
-
-        $product
-            ->setCategory($category);
-
         if (in_array(User::ROLE_ADMIN, $user->getRoles())) {
             $this->entityManager->flush();
 
@@ -192,8 +178,7 @@ class ProductController extends AbstractController
             $requestData['itemsPerPage'] ?? 10,
             $requestData['page'] ?? 1,
             $requestData['id'] ?? null,
-            $requestData['categoryId'] ?? null,
-            $requestData['categoryId'] ?? null,
+            $requestData['categoryName'] ?? null,
             $requestData['categoryType'] ?? null,
             $requestData['name'] ?? null,
             $requestData['price'] ?? null,

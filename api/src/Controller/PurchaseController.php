@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Category;
 use App\Entity\Product;
 use App\Entity\Purchase;
 use App\Entity\User;
@@ -45,7 +44,6 @@ class PurchaseController extends AbstractController
 
         if (!isset(
             $requestData['user'],
-            $requestData['category'],
             $requestData['quantity'],
         )) {
             throw new Exception('Invalid request data');
@@ -53,7 +51,6 @@ class PurchaseController extends AbstractController
 
         $user = $this->entityManager->getRepository(User::class)->find($requestData['user']);
         $product = $this->entityManager->getRepository(Product::class)->find($requestData["product"]);
-        $category = $this->entityManager->getRepository(Category::class)->find($requestData["category"]);
 
         $quantity = $requestData['quantity'];
         $amount = $product->getPrice() * $quantity;
@@ -64,12 +61,12 @@ class PurchaseController extends AbstractController
         $purchase
             ->setUser($user)
             ->setProduct($product)
-            ->setCategory($category)
             ->setQuantity($requestData['quantity'])
             ->setAmount($amount)
             ->setPurchaseDate(new DateTime());
 
         if (in_array(User::ROLE_USER, $user->getRoles())) {
+
             $this->entityManager->persist($purchase);
             $this->entityManager->flush();
 
@@ -83,7 +80,7 @@ class PurchaseController extends AbstractController
      * @return JsonResponse
      */
     #[Route('purchases', name: 'purchase_get_all')]
-    public function getAllPurchases(): JsonResponse
+    public function getAllPurchase(): JsonResponse
     {
         /** @var Purchase $purchases */
         $purchases = $this->entityManager->getRepository(Purchase::class)->findAll();
@@ -133,8 +130,6 @@ class PurchaseController extends AbstractController
         /** @var $requestData */
         $requestData = json_decode($request->getContent(), true);
 
-        $category = $this->entityManager->getRepository(Category::class)->find($requestData["category"]);
-
         /** @var $fieldsToUpdate */
         $fieldsToUpdate = ['name', 'price', 'description'];
 
@@ -144,9 +139,6 @@ class PurchaseController extends AbstractController
                 $purchase->$setterMethod($requestData[$field]);
             }
         }
-
-        $purchase
-            ->setCategory($category);
 
         $this->entityManager->flush();
 
@@ -193,8 +185,7 @@ class PurchaseController extends AbstractController
             $requestData['itemsPerPage'] ?? 10,
             $requestData['page'] ?? 1,
             $requestData['userId'] ?? null,
-            $requestData['productId'] ?? null,
-            $requestData['categoryId'] ?? null
+            $requestData['productId'] ?? null
         );
 
         return new JsonResponse($purchases, Response::HTTP_OK);

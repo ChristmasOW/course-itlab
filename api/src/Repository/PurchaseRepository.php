@@ -29,20 +29,17 @@ class PurchaseRepository extends ServiceEntityRepository
      * @param int $page
      * @param int|null $userId
      * @param int|null $productId
-     * @param int|null $categoryId
      * @return array
      */
-    public function getAllPurchases(int $itemsPerPage, int $page, ?int $userId = null, ?int $productId = null, ?int $categoryId = null): array
+    public function getAllPurchases(int $itemsPerPage, int $page, ?int $userId = null, ?int $productId = null): array
     {
         return $this->createQueryBuilder('purchase')
             ->leftJoin('purchase.product', 'product')
             ->leftJoin('product.category', 'productCategory')
             ->andWhere('purchase.user = :userId')
             ->andWhere('purchase.product = :productId')
-            ->andWhere('category.id = :categoryId')
             ->setParameter('userId', "%" . $userId . "%")
             ->setParameter('productId', "%" . $productId . "%")
-            ->setParameter('categoryId', "%" . $categoryId . "%")
             ->setFirstResult($itemsPerPage * ($page - 1))
             ->setMaxResults($itemsPerPage)
             ->orderBy('purchase.purchaseDate', 'DESC')

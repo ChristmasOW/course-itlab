@@ -24,8 +24,9 @@ class Purchase implements JsonSerializable
     #[ORM\Column(type: 'datetime')]
     private ?DateTimeInterface $purchaseDate = null;
 
+    /** @var integer */
     #[ORM\Column(type: "integer")]
-    private $quantity;
+    private int $quantity;
 
     /** @var User|null  */
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -34,10 +35,6 @@ class Purchase implements JsonSerializable
     /** @var Product|null  */
     #[ORM\ManyToOne(targetEntity: Product::class)]
     private ?Product $product = null;
-
-    /** @var Category|null  */
-    #[ORM\ManyToOne(targetEntity: Category::class)]
-    private ?Category $category = null;
 
     /**
      * @return int|null
@@ -124,25 +121,6 @@ class Purchase implements JsonSerializable
     }
 
     /**
-     * @return Category|null
-     */
-    public function getCategory(): ?Category
-    {
-        return $this->category;
-    }
-
-    /**
-     * @param Category|null $category
-     * @return $this
-     */
-    public function setCategory(?Category $category): self
-    {
-        $this->category = $category;
-
-        return $this;
-    }
-
-    /**
      * @return int|null
      */
     public function getQuantity(): ?int
@@ -175,9 +153,7 @@ class Purchase implements JsonSerializable
             "amount" => $this->getAmount(),
             "purchaseDate" => $this->getPurchaseDate(),
             "user" => $this->getUser(),
-            "product" => $this->getProduct(),
-            "category" => $this->getCategory(),
+            "product" => $this->getProduct()
         ];
     }
-
 }

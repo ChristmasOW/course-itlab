@@ -28,7 +28,6 @@ class ProductRepository extends ServiceEntityRepository
      * @param int $itemsPerPage
      * @param int $page
      * @param int|null $id
-     * @param int|null $categoryId
      * @param string|null $categoryName
      * @param string|null $categoryType
      * @param string|null $name
@@ -36,21 +35,19 @@ class ProductRepository extends ServiceEntityRepository
      * @param string|null $description
      * @return array
      */
-    public function getAllProducts(int     $itemsPerPage, int $page, ?int $id = null, ?int $categoryId = null,
+    public function getAllProducts(int     $itemsPerPage, int $page, ?int $id = null,
                                    ?string $categoryName = null, ?string $categoryType = null,
                                    ?string $name = null, ?string $price = null, ?string $description = null): array
     {
         return $this->createQueryBuilder('product')
             ->join('product.category', 'category')
             ->andWhere("product.id LIKE :id")
-            ->andWhere('category.id LIKE :categoryId')
             ->andWhere('category.name LIKE :categoryName')
             ->andWhere('category.type LIKE :categoryType')
             ->andWhere("product.name LIKE :name")
             ->andWhere("product.price LIKE :price")
             ->andWhere("product.description LIKE :description")
             ->setParameter("id", "%" . $id . "%")
-            ->setParameter("categoryId", "%" . $categoryId . "%")
             ->setParameter("categoryName", "%" . $categoryName . "%")
             ->setParameter("categoryType", "%" . $categoryType . "%")
             ->setParameter("name", "%" . $name . "%")
