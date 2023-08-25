@@ -10,14 +10,17 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 class Category implements \JsonSerializable
 {
+    /** @var int|null */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    /** @var string|null */
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    /** @var string|null */
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
@@ -52,9 +55,10 @@ class Category implements \JsonSerializable
      * @param string|null $name
      * @return $this
      */
-    public function setName(?string $name): static
+    public function setName(?string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -73,6 +77,7 @@ class Category implements \JsonSerializable
     public function setType(?string $type): self
     {
         $this->type = $type;
+
         return $this;
     }
 
@@ -86,10 +91,12 @@ class Category implements \JsonSerializable
 
     /**
      * @param ArrayCollection|Collection $products
+     * @return $this
      */
     public function setProducts(ArrayCollection|Collection $products): self
     {
         $this->products = $products;
+
         return $this;
     }
 
@@ -104,6 +111,4 @@ class Category implements \JsonSerializable
             'type' => $this->getType()
         ];
     }
-
-
 }

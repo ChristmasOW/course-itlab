@@ -20,4 +20,28 @@ class CategoryRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Category::class);
     }
+
+    /**
+     * @param int $itemsPerPage
+     * @param int $page
+     * @param int|null $id
+     * @param string|null $name
+     * @param string|null $type
+     * @return array
+     */
+    public function getAllCategories(int $itemsPerPage, int $page, ?int $id = null, ?string $name = null, ?string $type = null): array
+    {
+        return $this->createQueryBuilder('patients')
+            ->andWhere("category.id LIKE :id")
+            ->andWhere("category.name LIKE :name")
+            ->andWhere("category.type LIKE :type")
+            ->setParameter("id", "%" . $id . "%")
+            ->setParameter("name", "%" . $name . "%")
+            ->setParameter("type", "%" . $type . "%")
+            ->setFirstResult($itemsPerPage * ($page - 1))
+            ->setMaxResults($itemsPerPage)
+            ->orderBy('category.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

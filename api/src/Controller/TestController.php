@@ -60,5 +60,4 @@ class TestController extends AbstractController
 
         return $fetchedProductsForUser;
     }
-
 }

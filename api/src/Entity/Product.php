@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -11,28 +12,43 @@ use JsonSerializable;
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product implements JsonSerializable
 {
+    /** @var int|null */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    /** @var string|null */
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    /** @var string|null */
     #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: '0')]
     private ?string $price = null;
 
+    /** @var string|null */
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    /** @var Category|null */
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "products")]
     private ?Category $category = null;
 
-//    #[ORM\OneToOne(targetEntity: ProductInfo::class)]
-//    private ?ProductInfo $productInfo = null;
+    #[ORM\OneToMany(mappedBy: "product", targetEntity: Purchase::class)]
+    private Collection $purchases;
 
-    #[ORM\ManyToMany(targetEntity: Test::class)]
-    private Collection $test;
+    public function __construct()
+    {
+        $this->purchases = new ArrayCollection();
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getPurchases(): Collection
+    {
+        return $this->purchases;
+    }
 
     /**
      * @return int|null
@@ -54,7 +70,7 @@ class Product implements JsonSerializable
      * @param string $name
      * @return $this
      */
-    public function setName(string $name): static
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -73,7 +89,7 @@ class Product implements JsonSerializable
      * @param string $price
      * @return $this
      */
-    public function setPrice(string $price): static
+    public function setPrice(string $price): self
     {
         $this->price = $price;
 
@@ -92,25 +108,11 @@ class Product implements JsonSerializable
      * @param string|null $description
      * @return $this
      */
-    public function setDescription(?string $description): static
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function jsonSerialize(): array
-    {
-        return [
-            "id"          => $this->getId(),
-            "name"        => $this->getName(),
-            "price"       => $this->getPrice(),
-            "description" => $this->getDescription(),
-            "category"    => $this->getCategory()
-        ];
     }
 
     /**
@@ -123,42 +125,26 @@ class Product implements JsonSerializable
 
     /**
      * @param Category|null $category
+     * @return $this
      */
-    public function setCategory(?Category $category): void
+    public function setCategory(?Category $category): self
     {
         $this->category = $category;
-    }
 
-//    /**
-//     * @return ProductInfo|null
-//     */
-//    public function getProductInfo(): ?ProductInfo
-//    {
-//        return $this->productInfo;
-//    }
-//
-//    /**
-//     * @param ProductInfo|null $productInfo
-//     */
-//    public function setProductInfo(?ProductInfo $productInfo): void
-//    {
-//        $this->productInfo = $productInfo;
-//    }
-
-    /**
-     * @return Collection
-     */
-    public function getTest(): Collection
-    {
-        return $this->test;
+        return $this;
     }
 
     /**
-     * @param Collection $test
+     * @return array
      */
-    public function setTest(Collection $test): void
+    public function jsonSerialize(): array
     {
-        $this->test = $test;
+        return [
+            "id" => $this->getId(),
+            "name" => $this->getName(),
+            "price" => $this->getPrice(),
+            "description" => $this->getDescription(),
+            "category" => $this->getCategory()
+        ];
     }
-
 }

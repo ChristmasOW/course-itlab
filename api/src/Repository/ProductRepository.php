@@ -24,31 +24,41 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
-
     /**
      * @param int $itemsPerPage
      * @param int $page
-     * @param string|null $name
+     * @param int|null $id
+     * @param int|null $categoryId
      * @param string|null $categoryName
-     * @return float|int|mixed|string
+     * @param string|null $categoryType
+     * @param string|null $name
+     * @param string|null $price
+     * @param string|null $description
+     * @return array
      */
-    public function getAllProductsByName(int $itemsPerPage, int $page, ?string $categoryName = null, ?string $name = null)
+    public function getAllProducts(int     $itemsPerPage, int $page, ?int $id = null, ?int $categoryId = null,
+                                   ?string $categoryName = null, ?string $categoryType = null,
+                                   ?string $name = null, ?string $price = null, ?string $description = null): array
     {
         return $this->createQueryBuilder('product')
-            /*->select('product.id', '')*/
             ->join('product.category', 'category')
-
+            ->andWhere("product.id LIKE :id")
+            ->andWhere('category.id LIKE :categoryId')
             ->andWhere('category.name LIKE :categoryName')
+            ->andWhere('category.type LIKE :categoryType')
             ->andWhere("product.name LIKE :name")
-
-            ->setParameter("name", "%" . $name . "%")
+            ->andWhere("product.price LIKE :price")
+            ->andWhere("product.description LIKE :description")
+            ->setParameter("id", "%" . $id . "%")
+            ->setParameter("categoryId", "%" . $categoryId . "%")
             ->setParameter("categoryName", "%" . $categoryName . "%")
-
-            ->setFirstResult($itemsPerPage * ($page -1))
+            ->setParameter("categoryType", "%" . $categoryType . "%")
+            ->setParameter("name", "%" . $name . "%")
+            ->setParameter("price", "%" . $price . "%")
+            ->setParameter("description", "%" . $description . "%")
+            ->setFirstResult($itemsPerPage * ($page - 1))
             ->setMaxResults($itemsPerPage)
             ->orderBy('product.name', 'ASK')
-            /*->groupBy('product.name')
-            ->having()*/
             ->getQuery()
             ->getResult();
     }

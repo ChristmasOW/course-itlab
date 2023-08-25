@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\PasswordHasher\Command\UserPasswordHashCommand;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -30,13 +32,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private array $roles = [];
 
     /**
-     * @var string The hashed password
+     * @var string|null
      */
     #[ORM\Column]
     private ?string $password = null;
 
+    #[ORM\OneToMany(mappedBy: "user", targetEntity: Purchase::class)]
+    private Collection $purchases;
+
+    /**
+     * @return Collection
+     */
+    public function getPurchases(): Collection
+    {
+        return $this->purchases;
+    }
+
     public function __construct()
     {
+        $this->purchases = new ArrayCollection();
         $this->roles = [self::ROLE_USER];
     }
 
@@ -86,12 +100,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @see UserInterface
+     * @return string[]
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-
         return $this->roles;
     }
 
