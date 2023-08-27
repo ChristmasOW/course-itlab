@@ -3,12 +3,16 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
+use App\Validator\Constraints\ProductConstraint;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
+#[ProductConstraint]
 class Product implements JsonSerializable
 {
     #[ORM\Id]
@@ -17,6 +21,8 @@ class Product implements JsonSerializable
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[NotBlank]
+    #[NotNull]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: '0')]
