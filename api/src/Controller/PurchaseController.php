@@ -43,25 +43,25 @@ class PurchaseController extends AbstractController
         $user = $this->getUser();
 
         if (!isset(
-            $requestData['user'],
+            $requestData['products'],
             $requestData['quantity'],
         )) {
             throw new Exception('Invalid request data');
         }
 
-        $user = $this->entityManager->getRepository(User::class)->find($requestData['user']);
-        $product = $this->entityManager->getRepository(Product::class)->find($requestData["product"]);
+        /** @var Product $product */
+        $products = $this->entityManager->getRepository(Product::class)->find($requestData["products"]);
 
         $quantity = $requestData['quantity'];
-        $amount = $product->getPrice() * $quantity;
+        $amount = $products->getPrice() * $quantity;
 
         /** @var $purchase */
         $purchase = new Purchase();
 
         $purchase
             ->setUser($user)
-            ->setProduct($product)
-            ->setQuantity($requestData['quantity'])
+            ->addProduct($products)
+            ->setQuantity($requestData['quantity'], $products)
             ->setAmount($amount)
             ->setPurchaseDate(new DateTime());
 
@@ -79,13 +79,28 @@ class PurchaseController extends AbstractController
     /**
      * @return JsonResponse
      */
-    #[Route('purchases', name: 'purchase_get_all')]
+    #[Route('/purchases', name: 'purchase_get_all')]
     public function getAllPurchase(): JsonResponse
     {
-        /** @var Purchase $purchases */
-        $purchases = $this->entityManager->getRepository(Purchase::class)->findAll();
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
 
-        return new JsonResponse($purchases, Response::HTTP_OK);
+        $userPurchases = $this->entityManager
+            ->getRepository(Purchase::class)
+            ->findBy(['user' => $currentUser]);
+
+        $purchaseData = [];
+        foreach ($userPurchases as $purchase) {
+            $purchaseData[] = [
+                'id' => $purchase->getId(),
+                'purchaseDate' => $purchase->getPurchaseDate(),
+                "product" => $purchase->getProducts()->toArray(),
+                'quantity' => $purchase->getQuantity(),
+                'amount' => $purchase->getAmount()
+            ];
+        }
+
+        return new JsonResponse($purchaseData, Response::HTTP_OK);
     }
 
     /**
@@ -93,14 +108,17 @@ class PurchaseController extends AbstractController
      * @return JsonResponse
      * @throws Exception
      */
-    #[Route('purchase/{id}', name: 'purchase_get_item')]
+    #[Route('purchases/{id}', name: 'purchase_get_item')]
     public function getItem(string $id): JsonResponse
     {
         /** @var Purchase $purchase */
         $purchase = $this->entityManager->getRepository(Purchase::class)->find($id);
 
-        if (!$purchase) {
-            throw new Exception("Purchase with id: " . $id . " not found");
+        /** @var User $currentUser */
+        $currentUser = $this->getUser();
+
+        if ($purchase->getUser() !== $currentUser) {
+            return new JsonResponse("Purchase with id: " . $id . " not found", Response::HTTP_NOT_FOUND);
         }
 
         return new JsonResponse($purchase, Response::HTTP_OK);
@@ -123,22 +141,24 @@ class PurchaseController extends AbstractController
         }
 
         $currentUser = $this->getUser();
-        if ($currentUser !== $purchase->getUser() || !in_array(User::ROLE_ADMIN, $currentUser->getRoles())) {
-            return new JsonResponse("You are not allowed to edit this purchase", Response::HTTP_FORBIDDEN);
+        if ($currentUser !== $purchase->getUser()) {
+            return new JsonResponse("Purchase not found", Response::HTTP_NOT_FOUND);
         }
 
         /** @var $requestData */
         $requestData = json_decode($request->getContent(), true);
 
-        /** @var $fieldsToUpdate */
-        $fieldsToUpdate = ['name', 'price', 'description'];
+        /** @var Product $product */
+        $products = $this->entityManager->getRepository(Product::class)->find($requestData["products"]);
 
-        foreach ($fieldsToUpdate as $field) {
-            if (isset($requestData[$field])) {
-                $setterMethod = 'set' . ucfirst($field);
-                $purchase->$setterMethod($requestData[$field]);
-            }
-        }
+        $quantity = $requestData['quantity'];
+        $amount = $products->getPrice() * $quantity;
+        
+        $purchase
+            ->addProduct($products)
+            ->setQuantity($requestData['quantity'], $products)
+            ->setAmount($amount)
+            ->setPurchaseDate(new DateTime());
 
         $this->entityManager->flush();
 
@@ -156,13 +176,9 @@ class PurchaseController extends AbstractController
         /** @var Purchase $purchase */
         $purchase = $this->entityManager->getRepository(Purchase::class)->find($id);
 
-        if (!$purchase) {
-            throw new Exception("Purchase with id: " . $id . " not found");
-        }
-
         $currentUser = $this->getUser();
-        if ($currentUser !== $purchase->getUser() || !in_array(User::ROLE_ADMIN, $currentUser->getRoles())) {
-            return new JsonResponse("You are not allowed to delete this purchase", Response::HTTP_FORBIDDEN);
+        if ($currentUser !== $purchase->getUser()) {
+            return new JsonResponse("Purchase not found", Response::HTTP_NOT_FOUND);
         }
 
         $this->entityManager->remove($purchase);

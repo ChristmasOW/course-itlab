@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\PurchaseRepository;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JsonSerializable;
 
@@ -32,9 +34,15 @@ class Purchase implements JsonSerializable
     #[ORM\ManyToOne(targetEntity: User::class)]
     private ?User $user = null;
 
-    /** @var Product|null  */
-    #[ORM\ManyToOne(targetEntity: Product::class)]
-    private ?Product $product = null;
+    /**
+     * @var Collection
+     */
+    #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: "purchases")]
+    private Collection $products;
+
+    public function __construct() {
+        $this->products = new ArrayCollection();
+    }
 
     /**
      * @return int|null
@@ -102,25 +110,6 @@ class Purchase implements JsonSerializable
     }
 
     /**
-     * @return Product|null
-     */
-    public function getProduct(): ?Product
-    {
-        return $this->product;
-    }
-
-    /**
-     * @param Product|null $product
-     * @return $this
-     */
-    public function setProduct(?Product $product): self
-    {
-        $this->product = $product;
-
-        return $this;
-    }
-
-    /**
      * @return int|null
      */
     public function getQuantity(): ?int
@@ -130,14 +119,43 @@ class Purchase implements JsonSerializable
 
     /**
      * @param int|null $quantity
+     * @param Product $products
      * @return $this
      */
-    public function setQuantity(?int $quantity): self
+    public function setQuantity(?int $quantity, Product $products): self
     {
         $this->quantity = $quantity;
+        if ($this->quantity) {
+            $this->amount = $products->getPrice() * $this->quantity;
+        }
 
-        if ($this->product && $this->quantity) {
-            $this->amount = $this->product->getPrice() * $this->quantity;
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    /**
+     * @param Collection $products
+     * @return $this
+     */
+    public function setProducts(Collection $products): self
+    {
+        $this->products = $products;
+
+        return $this;
+    }
+
+    public function addProduct(Product $product): self
+    {
+        if (!$this->products->contains($product)) {
+            $this->products[] = $product;
+            $product->addPurchase($this);
         }
 
         return $this;
@@ -150,10 +168,10 @@ class Purchase implements JsonSerializable
     {
         return [
             "id" => $this->getId(),
-            "amount" => $this->getAmount(),
             "purchaseDate" => $this->getPurchaseDate(),
-            "user" => $this->getUser(),
-            "product" => $this->getProduct()
+            "product" => $this->getProducts()->toArray(),
+            "quantity" => $this->getQuantity(),
+            "amount" => $this->getAmount()
         ];
     }
 }

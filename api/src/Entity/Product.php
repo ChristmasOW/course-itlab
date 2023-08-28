@@ -34,20 +34,14 @@ class Product implements JsonSerializable
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "products")]
     private ?Category $category = null;
 
-    #[ORM\OneToMany(mappedBy: "product", targetEntity: Purchase::class)]
+    /**
+     * @var Collection
+     */
+    #[ORM\ManyToMany(targetEntity: Purchase::class, mappedBy: "products")]
     private Collection $purchases;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->purchases = new ArrayCollection();
-    }
-
-    /**
-     * @return Collection
-     */
-    public function getPurchases(): Collection
-    {
-        return $this->purchases;
     }
 
     /**
@@ -130,6 +124,38 @@ class Product implements JsonSerializable
     public function setCategory(?Category $category): self
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getPurchases(): Collection
+    {
+        return $this->purchases;
+    }
+
+    /**
+     * @param Collection $purchases
+     * @return $this
+     */
+    public function setPurchases(Collection $purchases): self
+    {
+        $this->purchases = $purchases;
+
+        return $this;
+    }
+
+    /**
+     * @param Purchase $purchase
+     * @return $this
+     */
+    public function addPurchase(Purchase $purchase): self
+    {
+        if (!$this->purchases->contains($purchase)) {
+            $this->purchases[] = $purchase;
+        }
 
         return $this;
     }

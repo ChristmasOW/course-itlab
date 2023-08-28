@@ -84,7 +84,7 @@ class ProductController extends AbstractController
      * @return JsonResponse
      * @throw Exception
      */
-    #[Route('product/{id}', name: 'product_get_item')]
+    #[Route('products/{id}', name: 'product_get_item')]
     public function getItem(string $id): JsonResponse
     {
         /** @var Product $product */
