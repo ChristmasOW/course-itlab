@@ -60,7 +60,7 @@ class TestController extends AbstractController
         $errors = $this->validator->validate($product);
 
         if (count($errors) > 0) {
-            return new JsonResponse(strval($errors));
+            return new JsonResponse((string)$errors);
         }
 
         return new JsonResponse($product);

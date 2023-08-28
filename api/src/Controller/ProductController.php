@@ -26,31 +26,31 @@ class ProductController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-    #[Route('/product-create', name: 'product_create')]
+    #[Route('/products', name: 'product_create', methods: 'POST')]
     public function create(Request $request): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
         if (!isset(
             $requestData['price'],
             $requestData['name'],
-            $requestData['description'],
-            $requestData['category']
+            $requestData['description']
+            // $requestData['category']
         )) {
             throw new Exception('Invalid request data');
         }
 
-        $category = $this->entityManager->getRepository(Category::class)->find($requestData["category"]);
-        if (!$category) {
-            throw new Exception("Category with id " . $requestData['category'] . " not found");
-        }
+        // $category = $this->entityManager->getRepository(Category::class)->find($requestData["category"]);
+        // if (!$category) {
+        //     throw new Exception("Category with id " . $requestData['category'] . " not found");
+        // }
 
         $product = new Product();
 
         $product
             ->setPrice($requestData['price'])
             ->setName($requestData['name'])
-            ->setDescription($requestData['description'])
-            ->setCategory($category);
+            ->setDescription($requestData['description']);
+            // ->setCategory($category);
 
         $this->entityManager->persist($product);
         $this->entityManager->flush();
@@ -58,7 +58,7 @@ class ProductController extends AbstractController
         return new JsonResponse($product, Response::HTTP_CREATED);
     }
 
-    #[Route('/products', name: 'product_get_all')]
+    #[Route('/products', name: 'product_get_all', methods: 'GET')]
     public function getAll(): JsonResponse
     {
         /** @var Product $product */
@@ -71,7 +71,7 @@ class ProductController extends AbstractController
      * @param string $id
      * @return JsonResponse
      */
-    #[Route('product/{id}', name: 'product_get_item')]
+    #[Route('product/{id}', name: 'product_get_item', methods: 'GET')]
     public function getItem(string $id): JsonResponse
     {
         /** @var Product $product */
@@ -84,7 +84,7 @@ class ProductController extends AbstractController
         return new JsonResponse($product);
     }
 
-    #[Route('product-update/{id}', name: 'product_update_item')]
+    #[Route('products/{id}', name: 'product_update_item', methods: 'PUT')]
     public function updateProduct(string $id): JsonResponse
     {
         /** @var Product $product */
@@ -101,7 +101,7 @@ class ProductController extends AbstractController
         return new JsonResponse($product);
     }
 
-    #[Route('product-delete/{id}', name: 'product_delete_item')]
+    #[Route('products/{id}', name: 'product_delete_item', methods: 'DELETE')]
     public function deleteProduct(string $id): JsonResponse
     {
         /** @var Product $product */
