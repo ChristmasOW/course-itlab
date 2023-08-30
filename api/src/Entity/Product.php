@@ -2,30 +2,38 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\ProductRepository;
-use App\Validator\Constraints\ProductConstraint;
-use Doctrine\Common\Collections\Collection;
+use JsonSerializable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use JsonSerializable;
+use App\Repository\ProductRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use App\Validator\Constraints\ProductConstraint;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ApiResource(
     collectionOperations: [
-        "post" => [
-            "method" => "POST",
-            "security" => "is_granted('" . User::ROLE_ADMIN . "')"
-        ],
         "get" => [
             "method" => "GET",
-            "security" => "is_granted('" . User::ROLE_USER . "')"
+            "security" => "is_granted('" . User::ROLE_USER . "')",
+            "normalization_context" => ['groups' => ["get:collection:product"]]
+        ],
+        "post" => [
+            "method" => "POST",
+            "security" => "is_granted('" . User::ROLE_USER . "')",
+            "denormalization_context" => ['groups' => ["post:collection:product"]],
+            "normalization_context" => ['groups' => ["get:collection:product"]]
         ]
     ],
     itemOperations: [
         "get" => [
-            "method" => "GET"
+            "method" => "GET",
+            "normalization_context" => ['groups' => ["get:item:product"]]
         ],
         "put" => [
             "method" => "PUT",
@@ -40,12 +48,23 @@ use Symfony\Component\Validator\Constraints as Assert;
         "security" => "is_granted('" . User::ROLE_USER . "') or is_granted('" . User::ROLE_ADMIN . "')"
     ]
 )]
+#[ApiFilter(SearchFilter::class, properties: [
+    "name" => "partial",
+    "description"
+])]
+#[ApiFilter(RangeFilter::class, properties: [
+    "price"
+])]
 #[ProductConstraint]
-class Product implements JsonSerializable
+class Product
+// implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups([
+        "get:item:product"
+    ])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -57,20 +76,37 @@ class Product implements JsonSerializable
         minMessage: 'Your product name must have at least {{ limit }} characters long',
         maxMessage: 'Your product name cannot be longer that {{ limit }} characters',
     )]
+    #[Groups([
+        "get:collection:product",
+        "get:item:product",
+        "post:collection:product"
+    ])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: '0')]
     #[Assert\Positive]
     #[Assert\LessThanOrEqual(300)]
+    #[Groups([
+        "get:item:product",
+        "post:collection:product"
+    ])]
     private ?string $price = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Assert\NotBlank]
     #[Assert\NotNull]
+    #[Groups([
+        "get:item:product",
+        "post:collection:product"
+    ])]
     private ?string $description = null;
 
-    //    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "products")]
-    //    private ?Category $category = null;
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "products")]
+    #[Groups([
+        "get:item:product",
+        "post:collection:product"
+    ])]
+    private ?Category $category = null;
 
     //    #[ORM\OneToOne(targetEntity: ProductInfo::class)]
     //    private ?ProductInfo $productInfo = null;
@@ -143,35 +179,35 @@ class Product implements JsonSerializable
         return $this;
     }
 
+    // /**
+    //  * @return array
+    //  */
+    // public function jsonSerialize(): array
+    // {
+    //     return [
+    //         "id" => $this->getId(),
+    //         "name" => $this->getName(),
+    //         "price" => $this->getPrice(),
+    //         "description" => $this->getDescription()
+    //         //            "category"    => $this->getCategory()
+    //     ];
+    // }
+
     /**
-     * @return array
+     * @return Category|null
      */
-    public function jsonSerialize(): array
+    public function getCategory(): ?Category
     {
-        return [
-            "id" => $this->getId(),
-            "name" => $this->getName(),
-            "price" => $this->getPrice(),
-            "description" => $this->getDescription()
-            //            "category"    => $this->getCategory()
-        ];
+        return $this->category;
     }
-    //
-    //    /**
-    //     * @return Category|null
-    //     */
-    //    public function getCategory(): ?Category
-    //    {
-    //        return $this->category;
-    //    }
-    //
-    //    /**
-    //     * @param Category|null $category
-    //     */
-    //    public function setCategory(?Category $category): void
-    //    {
-    //        $this->category = $category;
-    //    }
+
+    /**
+     * @param Category|null $category
+     */
+    public function setCategory(?Category $category): void
+    {
+        $this->category = $category;
+    }
 
     //    /**
     //     * @return ProductInfo|null

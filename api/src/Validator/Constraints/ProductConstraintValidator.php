@@ -27,13 +27,12 @@ class ProductConstraintValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, Product::class);
         }
 
-        $name = $value->getName();
+        // $name = $value->getName();
 
-        if ($name !== ucfirst($name)) {
-            $this->context->buildViolation("Product name should start with a capital letter.")
-                ->addViolation();
-        }
+        // if ($name !== ucfirst($name)) {
+        //     $this->context->buildViolation("Product name should start with a capital letter.")
+        //         ->addViolation();
+        // }
 
-        $this->context->addViolation("Error");
     }
 }

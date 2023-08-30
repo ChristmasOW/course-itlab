@@ -27,6 +27,5 @@ class CategoryConstraintValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, Category::class);
         }
 
-        $this->context->addViolation("Error");
     }
 }

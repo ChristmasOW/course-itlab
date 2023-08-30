@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[CategoryConstraint]
@@ -40,11 +41,14 @@ use Symfony\Component\Validator\Constraints as Assert;
         "security" => "is_granted('" . User::ROLE_USER . "') or is_granted('" . User::ROLE_ADMIN . "')"
     ]
 )]
-class Category implements \JsonSerializable
+class Category
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups([
+        "get:item:product"
+    ])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -57,6 +61,9 @@ class Category implements \JsonSerializable
         minMessage: 'Your category name must be at least {{ limit }} characters long',
         maxMessage: 'Your category name cannot be longer that {{ limit }} characters',
     )]
+    #[Groups([
+        "get:item:product"
+    ])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -68,18 +75,21 @@ class Category implements \JsonSerializable
         minMessage: 'Your type must be at least {{ limit }} characters long',
         maxMessage: 'Your type cannot be longer that {{ limit }} characters',
     )]
+    #[Groups([
+        "get:item:product"
+    ])]
     private ?string $type = null;
 
-//    #[ORM\OneToMany(mappedBy: "category", targetEntity: Product::class)]
-//    private Collection $products;
+    #[ORM\OneToMany(mappedBy: "category", targetEntity: Product::class)]
+    private Collection $products;
 
-//    /**
-//     * Category constructor
-//     */
-//    public function __construct()
-//    {
-//        $this->products = new ArrayCollection();
-//    }
+    /**
+     * Category constructor
+     */
+    public function __construct()
+    {
+        $this->products = new ArrayCollection();
+    }
 
     /**
      * @return int|null
@@ -124,35 +134,34 @@ class Category implements \JsonSerializable
         $this->type = $type;
         return $this;
     }
-//
-//    /**
-//     * @return ArrayCollection|Collection
-//     */
-//    public function getProducts(): ArrayCollection|Collection
-//    {
-//        return $this->products;
-//    }
-//
-//    /**
-//     * @param ArrayCollection|Collection $products
-//     */
-//    public function setProducts(ArrayCollection|Collection $products): self
-//    {
-//        $this->products = $products;
-//        return $this;
-//    }
 
     /**
-     * @return array
+     * @return ArrayCollection|Collection
      */
-    public function jsonSerialize(): array
+    public function getProducts(): ArrayCollection|Collection
     {
-        return [
-            'id' => $this->getId(),
-            'name' => $this->getName(),
-            'type' => $this->getType()
-        ];
+        return $this->products;
     }
 
+    /**
+     * @param ArrayCollection|Collection $products
+     */
+    public function setProducts(ArrayCollection|Collection $products): self
+    {
+        $this->products = $products;
 
+        return $this;
+    }
+
+    // /**
+    //  * @return array
+    //  */
+    // public function jsonSerialize(): array
+    // {
+    //     return [
+    //         'id' => $this->getId(),
+    //         'name' => $this->getName(),
+    //         'type' => $this->getType()
+    //     ];
+    // }
 }
