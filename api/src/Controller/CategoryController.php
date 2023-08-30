@@ -26,98 +26,98 @@ class CategoryController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * @param Request $request
-     * @return JsonResponse
-     * @throws Exception
-     */
-    #[Route('/categories', name: 'category_create', methods: 'POST')]
-    public function create(Request $request): JsonResponse
-    {
-        $requestData = json_decode($request->getContent(), true);
-        if (!isset($requestData['name'], $requestData['type'])) {
-            throw new Exception('Invalid request data');
-        }
-        $category = new Category();
+    // /**
+    //  * @param Request $request
+    //  * @return JsonResponse
+    //  * @throws Exception
+    //  */
+    // #[Route('/categories', name: 'category_create', methods: 'POST')]
+    // public function create(Request $request): JsonResponse
+    // {
+    //     $requestData = json_decode($request->getContent(), true);
+    //     if (!isset($requestData['name'], $requestData['type'])) {
+    //         throw new Exception('Invalid request data');
+    //     }
+    //     $category = new Category();
 
-        $category->setName($requestData['name']);
-        $category->setType($requestData['type']);
+    //     $category->setName($requestData['name']);
+    //     $category->setType($requestData['type']);
 
-        $this->entityManager->persist($category);
-        $this->entityManager->flush();
+    //     $this->entityManager->persist($category);
+    //     $this->entityManager->flush();
 
-        return new JsonResponse($category, Response::HTTP_CREATED);
-    }
+    //     return new JsonResponse($category, Response::HTTP_CREATED);
+    // }
 
-    /**
-     * @return JsonResponse
-     */
-    #[Route('/categories', name: 'product_get_all', methods: 'GET')]
-    public function getAll(): JsonResponse
-    {
-        /** @var Category $category */
-        $category = $this->entityManager->getRepository(Category::class)->findAll();
-        return new JsonResponse($category);
-    }
+    // /**
+    //  * @return JsonResponse
+    //  */
+    // #[Route('/categories', name: 'product_get_all', methods: 'GET')]
+    // public function getAll(): JsonResponse
+    // {
+    //     /** @var Category $category */
+    //     $category = $this->entityManager->getRepository(Category::class)->findAll();
+    //     return new JsonResponse($category);
+    // }
 
-    /**
-     * @param string $id
-     * @return JsonResponse
-     * @throws Exception
-     */
-    #[Route('categories/{id}', name: 'product_get_item', methods: 'GET')]
-    public function getItem(string $id): JsonResponse
-    {
-        /** @var Category $category */
-        $category = $this->entityManager->getRepository(Category::class)->find($id);
+    // /**
+    //  * @param string $id
+    //  * @return JsonResponse
+    //  * @throws Exception
+    //  */
+    // #[Route('categories/{id}', name: 'product_get_item', methods: 'GET')]
+    // public function getItem(string $id): JsonResponse
+    // {
+    //     /** @var Category $category */
+    //     $category = $this->entityManager->getRepository(Category::class)->find($id);
 
-        if (!$category) {
-            throw new Exception("Category with id: " . $id . " not found");
-        }
+    //     if (!$category) {
+    //         throw new Exception("Category with id: " . $id . " not found");
+    //     }
 
-        return new JsonResponse($category);
-    }
+    //     return new JsonResponse($category);
+    // }
 
-    /**
-     * @param string $id
-     * @return JsonResponse
-     * @throws Exception
-     */
-    #[Route('categories/{id}', name: 'product_update_item', methods: 'PUT')]
-    public function updateProduct(string $id): JsonResponse
-    {
-        /** @var Category $category */
-        $category = $this->entityManager->getRepository(Category::class)->find($id);
+    // /**
+    //  * @param string $id
+    //  * @return JsonResponse
+    //  * @throws Exception
+    //  */
+    // #[Route('categories/{id}', name: 'product_update_item', methods: 'PUT')]
+    // public function updateProduct(string $id): JsonResponse
+    // {
+    //     /** @var Category $category */
+    //     $category = $this->entityManager->getRepository(Category::class)->find($id);
         
-        if (!$category) {
-            throw new Exception("Category with id: " . $id . " not found");
-        }
+    //     if (!$category) {
+    //         throw new Exception("Category with id: " . $id . " not found");
+    //     }
         
-        $category->setName("new name");
+    //     $category->setName("new name");
         
-        $this->entityManager->flush();
+    //     $this->entityManager->flush();
         
-        return new JsonResponse($category);
-    }
+    //     return new JsonResponse($category);
+    // }
 
-    /**
-     * @param string $id
-     * @return JsonResponse
-     * @throws Exception
-     */
-    #[Route('categories/{id}', name: 'product_delete_item', methods: 'DELETE')]
-    public function deleteProduct(string $id): JsonResponse
-    {
-        /** @var Category $category */
-        $category = $this->entityManager->getRepository(Category::class)->find($id);
+    // /**
+    //  * @param string $id
+    //  * @return JsonResponse
+    //  * @throws Exception
+    //  */
+    // #[Route('categories/{id}', name: 'product_delete_item', methods: 'DELETE')]
+    // public function deleteProduct(string $id): JsonResponse
+    // {
+    //     /** @var Category $category */
+    //     $category = $this->entityManager->getRepository(Category::class)->find($id);
         
-        if (!$category) {
-            throw new Exception("Category with id: " . $id . " not found");
-        }
+    //     if (!$category) {
+    //         throw new Exception("Category with id: " . $id . " not found");
+    //     }
                 
-        $this->entityManager->remove($category);
-        $this->entityManager->flush();
+    //     $this->entityManager->remove($category);
+    //     $this->entityManager->flush();
         
-        return new JsonResponse();
-    }
+    //     return new JsonResponse();
+    // }
 }
