@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     collectionOperations: [
         "post" => [
             "method" => "POST",
-            "security" => "is_granted('" . User::ROLE_USER . "')"
+            "security" => "is_granted('" . User::ROLE_ADMIN . "')"
         ],
         "get" => [
             "method" => "GET",
@@ -28,10 +28,12 @@ use Symfony\Component\Validator\Constraints as Assert;
             "method" => "GET"
         ],
         "put" => [
-            "method" => "PUT"
+            "method" => "PUT",
+            "security" => "is_granted('" . User::ROLE_ADMIN . "')"
         ],
         "delete" => [
-            "method" => "DELETE"
+            "method" => "DELETE",
+            "security" => "is_granted('" . User::ROLE_ADMIN . "')"
         ]
     ],
     attributes: [
