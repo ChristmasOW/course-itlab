@@ -111,8 +111,6 @@ class ProductController extends AbstractController
             throw new Exception("Product with id: " . $id . " not found");
         }
 
-        $product->setName("new name");
-
         $this->entityManager->remove($product);
         $this->entityManager->flush();
 

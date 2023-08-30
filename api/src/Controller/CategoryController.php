@@ -31,7 +31,7 @@ class CategoryController extends AbstractController
      * @return JsonResponse
      * @throws Exception
      */
-    #[Route('/category-create', name: 'category_create')]
+    #[Route('/categories', name: 'category_create', methods: 'POST')]
     public function create(Request $request): JsonResponse
     {
         $requestData = json_decode($request->getContent(), true);
@@ -52,12 +52,12 @@ class CategoryController extends AbstractController
     /**
      * @return JsonResponse
      */
-    #[Route('/products', name: 'product_get_all')]
+    #[Route('/categories', name: 'product_get_all', methods: 'GET')]
     public function getAll(): JsonResponse
     {
-        /** @var Product $product */
-        $products = $this->entityManager->getRepository(Product::class)->findAll();
-        return new JsonResponse($products);
+        /** @var Category $category */
+        $category = $this->entityManager->getRepository(Category::class)->findAll();
+        return new JsonResponse($category);
     }
 
     /**
@@ -65,15 +65,17 @@ class CategoryController extends AbstractController
      * @return JsonResponse
      * @throws Exception
      */
-    #[Route('product/{id}', name: 'product_get_item')]
+    #[Route('categories/{id}', name: 'product_get_item', methods: 'GET')]
     public function getItem(string $id): JsonResponse
     {
-        /** @var Product $product */
-        $product = $this->entityManager->getRepository(Product::class)->find($id);
-        if (!$product) {
-            throw new Exception("Product with id: " . $id . " not found");
+        /** @var Category $category */
+        $category = $this->entityManager->getRepository(Category::class)->find($id);
+
+        if (!$category) {
+            throw new Exception("Category with id: " . $id . " not found");
         }
-        return new JsonResponse($product);
+
+        return new JsonResponse($category);
     }
 
     /**
@@ -81,17 +83,21 @@ class CategoryController extends AbstractController
      * @return JsonResponse
      * @throws Exception
      */
-    #[Route('product-update/{id}', name: 'product_update_item')]
+    #[Route('categories/{id}', name: 'product_update_item', methods: 'PUT')]
     public function updateProduct(string $id): JsonResponse
     {
-        /** @var Product $product */
-        $product = $this->entityManager->getRepository(Product::class)->find($id);
-        if (!$product) {
-            throw new Exception("Product with id: " . $id . " not found");
+        /** @var Category $category */
+        $category = $this->entityManager->getRepository(Category::class)->find($id);
+        
+        if (!$category) {
+            throw new Exception("Category with id: " . $id . " not found");
         }
-        $product->setName("new name");
+        
+        $category->setName("new name");
+        
         $this->entityManager->flush();
-        return new JsonResponse($product);
+        
+        return new JsonResponse($category);
     }
 
     /**
@@ -99,17 +105,19 @@ class CategoryController extends AbstractController
      * @return JsonResponse
      * @throws Exception
      */
-    #[Route('product-delete/{id}', name: 'product_delete_item')]
+    #[Route('categories/{id}', name: 'product_delete_item', methods: 'DELETE')]
     public function deleteProduct(string $id): JsonResponse
     {
-        /** @var Product $product */
-        $product = $this->entityManager->getRepository(Product::class)->find($id);
-        if (!$product) {
-            throw new Exception("Product with id: " . $id . " not found");
+        /** @var Category $category */
+        $category = $this->entityManager->getRepository(Category::class)->find($id);
+        
+        if (!$category) {
+            throw new Exception("Category with id: " . $id . " not found");
         }
-        $product->setName("new name");
-        $this->entityManager->remove($product);
+                
+        $this->entityManager->remove($category);
         $this->entityManager->flush();
+        
         return new JsonResponse();
     }
 }
