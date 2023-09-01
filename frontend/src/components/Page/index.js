@@ -6,10 +6,13 @@ import Product from "../Product";
 import Gap from "../Gap";
 import Dashboard from "../Dashboard";
 import Blog from "../Blog";
+import Counter from "../Counter";
 
 function Page(props) {
     return <div className="container">
         <Header/>
+        <Gap/>
+        <Counter value={10} incrementValue={1}/>
         <Gap/>
         <Product/>
         <Gap/>
