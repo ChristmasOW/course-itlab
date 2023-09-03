@@ -53,17 +53,17 @@ class TestController extends AbstractController
     #[Route(path: "test", name: "app_test")]
     public function test(Request $request): JsonResponse
     {
-        $requestData = json_decode($request->getContent(), true);
+        // $requestData = json_decode($request->getContent(), true);
 
-        $product = $this->denormalizer->denormalize($requestData, Product::class, "array");
+        // $product = $this->denormalizer->denormalize($requestData, Product::class, "array");
 
-        $errors = $this->validator->validate($product);
+        // $errors = $this->validator->validate($product);
 
-        if (count($errors) > 0) {
-            return new JsonResponse((string)$errors);
-        }
+        // if (count($errors) > 0) {
+        //     return new JsonResponse((string)$errors);
+        // }
 
-        return new JsonResponse($product);
+        return new JsonResponse("test");
     }
 
     /**

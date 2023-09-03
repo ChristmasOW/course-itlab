@@ -14,6 +14,8 @@ use App\Validator\Constraints\ProductConstraint;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use App\Action\CreateProductAction;
+use App\EntityListener\ProductEntityListener;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ApiResource(
@@ -27,7 +29,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
             "method" => "POST",
             "security" => "is_granted('" . User::ROLE_USER . "')",
             "denormalization_context" => ['groups' => ["post:collection:product"]],
-            "normalization_context" => ['groups' => ["get:collection:product"]]
+            "normalization_context" => ['groups' => ["get:item:product"]],
+            "controller" => CreateProductAction::class
         ]
     ],
     itemOperations: [
@@ -52,9 +55,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
     "name" => "partial",
     "description"
 ])]
-#[ApiFilter(RangeFilter::class, properties: [
-    "price"
-])]
+#[ApiFilter(RangeFilter::class, properties: ["price"])]
+#[ORM\EntityListeners([ProductEntityListener::class])]
 #[ProductConstraint]
 class Product
 // implements JsonSerializable
@@ -207,6 +209,11 @@ class Product
     public function setCategory(?Category $category): void
     {
         $this->category = $category;
+    }
+
+    #[ORM\PostPersist]
+    public function test(){
+
     }
 
     //    /**
