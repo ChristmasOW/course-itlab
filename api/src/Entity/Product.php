@@ -22,7 +22,6 @@ use App\EntityListener\ProductEntityListener;
     collectionOperations: [
         "get" => [
             "method" => "GET",
-            "security" => "is_granted('" . User::ROLE_USER . "')",
             "normalization_context" => ['groups' => ["get:collection:product"]]
         ],
         "post" => [
