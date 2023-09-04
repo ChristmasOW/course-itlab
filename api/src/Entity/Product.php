@@ -110,6 +110,13 @@ class Product
     ])]
     private ?Category $category = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "products")]
+    #[Groups([
+        "get:item:product",
+        "post:collection:product"
+    ])]
+    private ?User $user = null;
+
     //    #[ORM\OneToOne(targetEntity: ProductInfo::class)]
     //    private ?ProductInfo $productInfo = null;
 
@@ -206,9 +213,29 @@ class Product
     /**
      * @param Category|null $category
      */
-    public function setCategory(?Category $category): void
+    public function setCategory(?Category $category): self
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User|null $user
+     * @return $this
+     */
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+        return $this;
     }
 
     #[ORM\PostPersist]

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\PasswordHasher\Command\UserPasswordHashCommand;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -34,6 +35,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\OneToMany(mappedBy: "user", targetEntity: Product::class)]
+    private Collection $products;
 
     public function __construct()
     {
@@ -121,6 +125,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    /**
+     * @param Collection $products
+     * @return $this
+     */
+    public function setProducts(Collection $products): self
+    {
+        $this->products = $products;
 
         return $this;
     }
