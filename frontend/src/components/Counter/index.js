@@ -18,7 +18,7 @@ export function Counter({ value = 0, minValue = -10, maxValue = 10, padding = 12
 
     return (
         <div style={{ padding, backgroundColor: counterValue < 0 ? '#6ea8fe' : 'yellow' }}>
-            <div>{counterValue}</div>
+            <div style={{color: 'black'}}>{counterValue}</div>
             <button onClick={handleIncrement}>+</button>
             <button onClick={handleDecrement}>-</button>
         </div>
