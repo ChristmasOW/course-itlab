@@ -47,7 +47,7 @@ use App\EntityListener\ProductEntityListener;
         ]
     ],
     attributes: [
-        "security" => "is_granted('" . User::ROLE_USER . "') or is_granted('" . User::ROLE_ADMIN . "')"
+        // "security" => "is_granted('" . User::ROLE_USER . "') or is_granted('" . User::ROLE_ADMIN . "')"
     ]
 )]
 #[ApiFilter(SearchFilter::class, properties: [
