@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 export function Counter({ value = 0, minValue = -10, maxValue = 10, padding = 12 }) {
@@ -16,9 +17,16 @@ export function Counter({ value = 0, minValue = -10, maxValue = 10, padding = 12
         }
     };
 
+    useEffect(() => {
+        console.log('Counter mounted');
+        return () => {
+            console.log('Counter unmounted');
+        };
+    }, []);
+
     return (
         <div style={{ padding, backgroundColor: counterValue < 0 ? '#6ea8fe' : 'yellow' }}>
-            <div style={{color: 'black'}}>{counterValue}</div>
+            <div style={{ color: 'black' }}>{counterValue}</div>
             <button onClick={handleIncrement}>+</button>
             <button onClick={handleDecrement}>-</button>
         </div>

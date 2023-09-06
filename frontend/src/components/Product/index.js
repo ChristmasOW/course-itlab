@@ -1,8 +1,13 @@
+import { useParams } from "react-router";
 import Gap from "../Gap";
 import Image from "../Image";
 
 function Product(props) {
+    const params = useParams();
+    const productId = params.productId;
+
     return <>
+        <h1 style={{backgroundColor: 'gray'}} >Ви обрали продукт № {productId}</h1>
         <div className="row featurette">
             <div className="col-md-7">
                 <h2 className="featurette-heading fw-normal lh-1">First featurette heading. <span className="text-body-secondary">It’ll blow your mind.</span></h2>
