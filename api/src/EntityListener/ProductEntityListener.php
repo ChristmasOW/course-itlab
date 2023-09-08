@@ -11,15 +11,16 @@ class ProductEntityListener
 {
     public function postPersist(Product $product, PostPersistEventArgs $eventArgs)
     {
-        $test = $eventArgs->getObjectManager()->getUnitOfWork()->getEntityChangeSet($product);
+        // $test = $eventArgs->getObjectManager()->getUnitOfWork()->getEntityChangeSet($product);
     }
 
     public function prePersist(Product $product, LifecycleEventArgs $eventArgs)
     {
-        // $test = 1;
-        $newName = $product->getName() . rand(10000, 99999);
-
-        $product->setName($newName);
+        $date = $product->getProductDate();
+        if ($date === null) {
+            $date = time() * 1000;
+            $product->setProductDate($date);
+        }
     }
 
     public function postUpdate(Product $product, LifecycleEventArgs $eventArgs)

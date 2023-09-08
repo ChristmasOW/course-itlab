@@ -26,7 +26,7 @@ use App\EntityListener\ProductEntityListener;
         ],
         "post" => [
             "method" => "POST",
-            "security" => "is_granted('" . User::ROLE_USER . "')",
+            "security" => "is_granted('" . User::ROLE_ADMIN . "')",
             "denormalization_context" => ['groups' => ["post:collection:product"]],
             "normalization_context" => ['groups' => ["get:item:product"]],
             "controller" => CreateProductAction::class
@@ -54,7 +54,7 @@ use App\EntityListener\ProductEntityListener;
     "name" => "partial",
     "description"
 ])]
-#[ApiFilter(RangeFilter::class, properties: ["price"])]
+#[ApiFilter(RangeFilter::class, properties: ["price", "productDate"])]
 #[ORM\EntityListeners([ProductEntityListener::class])]
 #[ProductConstraint]
 class Product
@@ -86,8 +86,8 @@ class Product
 
     #[ORM\Column(type: Types::DECIMAL, precision: 2, scale: '0')]
     #[Assert\Positive]
-    #[Assert\LessThanOrEqual(300)]
     #[Groups([
+        "get:collection:product",
         "get:item:product",
         "post:collection:product"
     ])]
@@ -97,6 +97,7 @@ class Product
     #[Assert\NotBlank]
     #[Assert\NotNull]
     #[Groups([
+        "get:collection:product",
         "get:item:product",
         "post:collection:product"
     ])]
@@ -104,7 +105,6 @@ class Product
 
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: "products")]
     #[Groups([
-        "get:item:product",
         "post:collection:product"
     ])]
     private ?Category $category = null;
@@ -116,11 +116,12 @@ class Product
     ])]
     private ?User $user = null;
 
-    //    #[ORM\OneToOne(targetEntity: ProductInfo::class)]
-    //    private ?ProductInfo $productInfo = null;
-
-    //    #[ORM\ManyToMany(targetEntity: Test::class)]
-    //    private Collection $test;
+    #[ORM\Column(type: Types::BIGINT)]
+    #[Groups([
+        "get:item:product",
+        "post:collection:product"
+    ])]
+    private ?int $productDate = null;
 
     /**
      * @return int|null
@@ -142,7 +143,7 @@ class Product
      * @param string $name
      * @return $this
      */
-    public function setName(string $name): static
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -161,7 +162,7 @@ class Product
      * @param string $price
      * @return $this
      */
-    public function setPrice(string $price): static
+    public function setPrice(string $price): self
     {
         $this->price = $price;
 
@@ -180,7 +181,7 @@ class Product
      * @param string|null $description
      * @return $this
      */
-    public function setDescription(?string $description): static
+    public function setDescription(?string $description): self
     {
         $this->description = $description;
 
@@ -219,6 +220,16 @@ class Product
         return $this;
     }
 
+    #[Groups([
+        "get:collection:product",
+        "get:item:product",
+        "post:collection:product"
+    ])]
+    public function getCategoryName(): ?string
+    {
+        return $this->category ? $this->category->getName() : null;
+    }
+
     /**
      * @return User|null
      */
@@ -237,9 +248,25 @@ class Product
         return $this;
     }
 
-    #[ORM\PostPersist]
-    public function test(){
+    #[Groups([
+        "get:collection:product",
+        "get:item:product",
+    ])]
+    public function getProductDate(): ?int
+    {
+        return $this->productDate;
+    }
 
+    public function setProductDate(?int $productDate): self
+    {
+        $this->productDate = $productDate;
+
+        return $this;
+    }
+
+    #[ORM\PostPersist]
+    public function test()
+    {
     }
 
     //    /**

@@ -7,9 +7,24 @@ import GoodsList from "./GoodsList";
 import { fetchFilterData, checkFilterItem } from "../../../utils/fetchFilterData";
 import userAuthenticationConfig from "../../../utils/userAuthenticationConfig";
 import GoodsFilter from "./GoodsFilter";
-import { Breadcrumbs, Link, Pagination, Typography } from "@mui/material";
+import { Breadcrumbs, Grid, Link, Pagination, Typography, TextField, Button, FormControl } from "@mui/material";
 
 const GoodsContainer = () => {
+
+  const [formData, setFormData] = useState({
+    productName: "",
+    productPrice: "",
+    productDescription: "",
+    productCategory: "",
+    productUser: "",
+  });
+
+  const clearFormFields = () => {
+    const clearedFormData = Object.fromEntries(
+      Object.keys(formData).map(key => [key, ""])
+    );
+    setFormData(clearedFormData);
+  };
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -18,11 +33,16 @@ const GoodsContainer = () => {
 
   const [filterData, setFilterData] = useState({
     "page": checkFilterItem(searchParams, "page", 1, true),
-    "name": checkFilterItem(searchParams, "name", null)
+    "name": checkFilterItem(searchParams, "name", null),
+    "price[gte]": checkFilterItem(searchParams, "price[gte]", null),
+    "price[lte]": checkFilterItem(searchParams, "price[lte]", null),
+    "productDate[gte]": checkFilterItem(searchParams, "productDate[gte]", null),
+    "productDate[lte]": checkFilterItem(searchParams, "productDate[lte]", null)
   });
 
   const fetchProducts = () => {
     let filterUrl = fetchFilterData(filterData);
+
     navigate(filterUrl);
 
     axios.get("/api/products" + filterUrl + "&itemsPerPage=" + paginationInfo.itemsPerPage, userAuthenticationConfig()).then(response => {
@@ -49,10 +69,41 @@ const GoodsContainer = () => {
     fetchProducts();
   }, [filterData]);
 
-  console.log(paginationInfo);
-
   const onChangePage = (event, page) => {
     setFilterData({ ...filterData, page: page });
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const newProduct = {
+      name: formData.productName,
+      price: formData.productPrice,
+      description: formData.productDescription,
+      category: formData.productCategory,
+      user: formData.productUser,
+    };
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        "/api/products",
+        newProduct,
+        {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }, userAuthenticationConfig());
+
+      if (response.status === responseStatus.HTTP_CREATED) {
+        // Update the products and clear the form fields in one block
+        fetchProducts();
+        clearFormFields();
+      }
+    } catch (error) {
+      console.error("Error creating a new product:", error);
+    }
   };
 
   return (
@@ -75,6 +126,55 @@ const GoodsContainer = () => {
         filterData={filterData}
         setFilterData={setFilterData}
       />
+      <form onSubmit={handleSubmit}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label="Product Name"
+              value={formData.productName}
+              onChange={(e) => setFormData({ ...formData, productName: e.target.value })}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label="Price"
+              value={formData.productPrice}
+              onChange={(e) => setFormData({ ...formData, productPrice: e.target.value })}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label="Description"
+              value={formData.productDescription}
+              onChange={(e) => setFormData({ ...formData, productDescription: e.target.value })}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label="Category"
+              value={formData.productCategory}
+              onChange={(e) => setFormData({ ...formData, productCategory: e.target.value })}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <TextField
+              label="User"
+              value={formData.productUser}
+              onChange={(e) => setFormData({ ...formData, productUser: e.target.value })}
+              required
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Button type="submit" variant="contained" color="primary">
+              Add Product
+            </Button>
+          </Grid>
+        </Grid>
+      </form>
       <GoodsList
         goods={goods}
       />
@@ -87,7 +187,6 @@ const GoodsContainer = () => {
         />}
     </>
   );
-
 };
 
 export default GoodsContainer;
